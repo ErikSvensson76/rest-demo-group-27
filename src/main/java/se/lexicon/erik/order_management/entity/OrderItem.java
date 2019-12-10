@@ -24,6 +24,7 @@ public class OrderItem {
         if(discount < 0 || discount > 100) throw new IllegalArgumentException("discount was " + discount + ". Valid range is 0 - 100");
         this.orderItemId = orderItemId;
         setProduct(product);
+        setOrder(order);
         setAmount(amount);
         BigDecimal fullPrice = BigDecimal.valueOf(product.getPrice().doubleValue() * amount);
         BigDecimal multiplicand = null;
@@ -72,11 +73,11 @@ public class OrderItem {
     }
 
     public BigDecimal getItemPrice() {
-        return itemPrice;
+        return itemPrice.setScale(2);
     }
 
     void setItemPrice(BigDecimal itemPrice) {
-        this.itemPrice = itemPrice;
+        this.itemPrice = itemPrice.setScale(2);
     }
 
     @Override
