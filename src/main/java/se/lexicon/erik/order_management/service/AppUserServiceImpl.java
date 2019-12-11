@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public class AppUserServiceImpl {
 
     private AppUserRepository userRepo;
+    private DtoConversionService conversionService;
 
 
     @Autowired
@@ -21,43 +22,21 @@ public class AppUserServiceImpl {
         this.userRepo = userRepo;
     }
 
-    public AppUser dtoToAppUser(AppUserDto dto){
-        AppUser newUser = new AppUser(
-                dto.getAppUserId(),
-                dto.getFirstName(),
-                dto.getLastName(),
-                dto.getEmail(),
-                dto.isActive(),
-                dto.getRegDate() == null ? LocalDate.now() : dto.getRegDate()
-        );
-
-        return newUser;
+    @Autowired
+    public void setConversionService(DtoConversionService conversionService) {
+        this.conversionService = conversionService;
     }
-
-    public AppUserDto appUserToDto(AppUser appUser){
-        AppUserDto dto = new AppUserDto(
-                appUser.getAppUserId(),
-                appUser.getFirstName(),
-                appUser.getLastName(),
-                appUser.getEmail(),
-                appUser.isActive(),
-                appUser.getRegDate()
-        );
-        return dto;
-    }
-
-
 
     @Transactional
     public AppUserDto createNewAppUser(AppUserDto newAppUserDto){
         if(newAppUserDto.getAppUserId() != 0){
             throw new IllegalArgumentException("AppUser had invalid id: " + newAppUserDto.getAppUserId());
         }
-        AppUser newUser = dtoToAppUser(newAppUserDto);
+        AppUser newUser = conversionService.dtoToAppUser(newAppUserDto);
 
         newUser = userRepo.save(newUser);
 
-        return appUserToDto(newUser);
+        return conversionService.appUserToDto(newUser, false);
     }
 
 }
