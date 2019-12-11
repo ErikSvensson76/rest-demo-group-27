@@ -72,13 +72,14 @@ public class ProductOrder {
                 for(OrderItem item : this.content){
                     item.setOrder(null);
                 }
-                this.content = null;
+
             }
         }else{
             for(OrderItem orderItem : content){
                 addOrderItem(orderItem);
             }
         }
+        this.content = content;
     }
 
     public boolean addOrderItem(OrderItem orderItem){
@@ -99,7 +100,7 @@ public class ProductOrder {
         if(orderItem == null){
             throw new IllegalArgumentException("OrderItem was null");
         }
-        if(orderItem.getOrder().equals(this)){
+        if(this.content.contains(orderItem)){
             orderItem.setOrder(null);
             return content.remove(orderItem);
         }
@@ -108,8 +109,10 @@ public class ProductOrder {
 
     public BigDecimal getTotalPrice(){
         BigDecimal totalPrice = BigDecimal.ZERO;
-        for(OrderItem item : content){
-            totalPrice = totalPrice.add(item.getItemPrice());
+        if(this.content != null){
+            for(OrderItem item : content){
+                totalPrice = totalPrice.add(item.getItemPrice());
+            }
         }
         return totalPrice.setScale(2, RoundingMode.HALF_UP);
     }
