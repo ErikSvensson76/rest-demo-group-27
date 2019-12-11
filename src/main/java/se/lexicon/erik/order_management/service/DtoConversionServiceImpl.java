@@ -75,12 +75,24 @@ public class DtoConversionServiceImpl implements DtoConversionService{
 
     @Override
     public ProductDto productToDto(Product product) {
-        return null;
+        ProductDto dto = new ProductDto(
+                product.getProductId(),
+                product.getProductName(),
+                product.getProductDescription(),
+                product.getPrice()
+        );
+        return dto;
     }
 
     @Override
     public Product dtoToProduct(ProductDto dto) {
-        return null;
+        Product product = new Product(
+              dto.getProductId(),
+              dto.getProductName(),
+              dto.getProductDescription(),
+              dto.getPrice()
+        );
+        return product;
     }
 
     @Override
