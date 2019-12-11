@@ -26,6 +26,7 @@ public class OrderItem {
         setProduct(product);
         setOrder(order);
         setAmount(amount);
+
         BigDecimal fullPrice = BigDecimal.valueOf(product.getPrice().doubleValue() * amount);
         BigDecimal multiplicand = null;
         if(discount > 0){
