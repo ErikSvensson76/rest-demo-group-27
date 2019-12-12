@@ -3,10 +3,7 @@ package se.lexicon.erik.order_management.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import se.lexicon.erik.order_management.data.AppUserRepository;
 import se.lexicon.erik.order_management.data.OrderItemRepository;
-import se.lexicon.erik.order_management.data.ProductOrderRepository;
-import se.lexicon.erik.order_management.data.ProductRepository;
 import se.lexicon.erik.order_management.dto.AppUserDto;
 import se.lexicon.erik.order_management.dto.OrderItemDto;
 import se.lexicon.erik.order_management.dto.ProductDto;
@@ -34,7 +31,7 @@ public class DtoConversionServiceImpl implements DtoConversionService{
 
     @Override
     public AppUser dtoToAppUser(AppUserDto dto) {
-        AppUser newUser = new AppUser(
+        return new AppUser(
                 dto.getAppUserId(),
                 dto.getFirstName(),
                 dto.getLastName(),
@@ -42,13 +39,11 @@ public class DtoConversionServiceImpl implements DtoConversionService{
                 dto.isActive(),
                 dto.getRegDate() == null ? LocalDate.now() : dto.getRegDate()
         );
-
-        return newUser;
     }
 
     @Override
     public AppUserDto appUserToDto(AppUser appUser, boolean withOrders) {
-        AppUserDto dto = new AppUserDto(
+        return new AppUserDto(
                 appUser.getAppUserId(),
                 appUser.getFirstName(),
                 appUser.getLastName(),
@@ -56,41 +51,36 @@ public class DtoConversionServiceImpl implements DtoConversionService{
                 appUser.isActive(),
                 appUser.getRegDate()
         );
-
-        return dto;
     }
 
     @Override
     public ProductDto productToDto(Product product) {
-        ProductDto dto = new ProductDto(
+        return new ProductDto(
                 product.getProductId(),
                 product.getProductName(),
                 product.getProductDescription(),
                 product.getPrice()
         );
-        return dto;
     }
 
     @Override
     public Product dtoToProduct(ProductDto dto) {
-        Product product = new Product(
+        return new Product(
               dto.getProductId(),
               dto.getProductName(),
               dto.getProductDescription(),
               dto.getPrice()
         );
-        return product;
     }
 
     @Override
     public OrderItemDto orderItemToDto(OrderItem orderItem) {
-        OrderItemDto dto = new OrderItemDto(
+        return new OrderItemDto(
                 orderItem.getOrderItemId(),
                 productToDto(orderItem.getProduct()),
                 orderItem.getAmount(),
                 orderItem.getItemPrice()
         );
-        return dto;
     }
 
     @Override
