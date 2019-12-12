@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import se.lexicon.erik.order_management.data.OrderItemRepository;
+import se.lexicon.erik.order_management.data.ProductOrderRepository;
 import se.lexicon.erik.order_management.dto.AppUserDto;
 import se.lexicon.erik.order_management.dto.OrderItemDto;
 import se.lexicon.erik.order_management.dto.ProductDto;
@@ -16,17 +17,27 @@ import se.lexicon.erik.order_management.exception.EntityNotFoundException;
 import se.lexicon.erik.order_management.exception.Exceptions;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class DtoConversionServiceImpl implements DtoConversionService{
 
     private OrderItemRepository orderItemRepository;
+    private ProductOrderRepository productOrderRepository;
 
     @Autowired
     public void setOrderItemRepository(OrderItemRepository orderItemRepository) {
         this.orderItemRepository = orderItemRepository;
+    }
+
+    @Autowired
+    public void setProductOrderRepository(ProductOrderRepository productOrderRepository) {
+        this.productOrderRepository = productOrderRepository;
     }
 
     @Override
@@ -78,20 +89,24 @@ public class DtoConversionServiceImpl implements DtoConversionService{
         return new OrderItemDto(
                 orderItem.getOrderItemId(),
                 productToDto(orderItem.getProduct()),
+                orderItem.getOrder().getOrderId(),
                 orderItem.getAmount(),
                 orderItem.getItemPrice()
         );
     }
 
     @Override
-    @Transactional(readOnly = true)
     public OrderItem dtoToOrderItem(OrderItemDto dto) throws EntityNotFoundException {
-        return orderItemRepository.findById(dto.getOrderItemId())
-                .orElseThrow(Exceptions.entityNotFoundException("Conversion failed: Requested OrderItem could not be found"));
+        return new OrderItem(
+                dto.getOrderItemId(),
+                dtoToProduct(dto.getProduct()),
+                dto.getOrderId() == 0 ? null : productOrderRepository.findById(dto.getOrderId()).orElseThrow(Exceptions.entityNotFoundException("Conversion to OrderItem failed: Requested Product could not be found")),
+                dto.getAmount(),
+                0
+        );
     }
 
     @Override
-    @Transactional(readOnly = true)
     public ProductOrderDto productOrderToDto(ProductOrder productOrder) {
         List<OrderItemDto> content = productOrder.getContent()
                 .stream()
@@ -108,12 +123,12 @@ public class DtoConversionServiceImpl implements DtoConversionService{
     }
 
     @Override
-    @Transactional(readOnly = true)
     public ProductOrder dtoToProductOrder(ProductOrderDto dto) {
-        List<Long> contentIds = dto.getContent().stream()
-                .map(OrderItemDto::getOrderItemId)
+        List<OrderItem> content = dto.getContent()
+                .stream()
+                .map(this::dtoToOrderItem)
                 .collect(Collectors.toList());
-        List<OrderItem> content = (List<OrderItem>) orderItemRepository.findAllById(contentIds);
+
         return new ProductOrder(
                 dto.getOrderId(),
                 dto.getOrderDateTime(),
