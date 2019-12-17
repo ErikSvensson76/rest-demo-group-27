@@ -53,8 +53,9 @@ public class DtoConversionServiceImpl implements DtoConversionService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public AppUserDto appUserToDto(AppUser appUser, boolean withOrders) {
-        return new AppUserDto(
+        AppUserDto dto = new AppUserDto(
                 appUser.getAppUserId(),
                 appUser.getFirstName(),
                 appUser.getLastName(),
@@ -62,6 +63,17 @@ public class DtoConversionServiceImpl implements DtoConversionService{
                 appUser.isActive(),
                 appUser.getRegDate()
         );
+
+        if(withOrders){
+            List<ProductOrder> orders = productOrderRepository.findByAppUserAppUserId(appUser.getAppUserId());
+            dto.setOrders(orders
+                    .stream()
+                    .map(this::productOrderToDto)
+                    .collect(Collectors.toList())
+            );
+        }
+        return dto;
+
     }
 
     @Override
