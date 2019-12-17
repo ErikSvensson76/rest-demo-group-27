@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.WeakHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -102,5 +103,12 @@ public class ProductOrderServiceImplTest {
         assertNotNull(updated);
         assertEquals(2, updated.getContent().size());
         assertEquals(2, em.find(ProductOrder.class, updated.getOrderId()).getContent().size());
+    }
+
+    @Test
+    public void given_productId_findByProductId_return_list_size_1(){
+        int productId = products.get(0).getProductId(); //Product1
+        List<ProductOrderDto> result = productOrderService.findByProductId(productId);
+        assertEquals(1, result.size());
     }
 }

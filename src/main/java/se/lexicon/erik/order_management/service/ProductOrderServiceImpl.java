@@ -97,5 +97,16 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
 
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductOrderDto> findByProductId(int productId){
+        List<ProductOrder> productOrders = productOrderRepository.findByContentProductProductId(productId);
+        List<ProductOrderDto> productOrderDtos = new ArrayList<>();
+        for(ProductOrder order : productOrders){
+            productOrderDtos.add(conversionService.productOrderToDto(order));
+        }
+        return productOrderDtos;
+    }
+
 
 }
